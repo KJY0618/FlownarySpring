@@ -2,7 +2,7 @@
 
 > 모든 세대가 쉽게 소통하는 SNS 소셜네트워크 플랫폼
 
-📅 개발 기간 : [2024.04.16~2024.06.14] (총 8주)
+📅 개발 기간 : [2024.04.16~2024.06.14]
 👥 팀원 : 6명
 
 <p align="center">
@@ -33,7 +33,7 @@
 
 ## 💾 DB ERD
 
-![ERD](images/erd.png)
+![ERD]<img width="800" alt="ERD" src="https://github.com/user-attachments/assets/17dc037f-1423-46b8-9ebc-7bd4f0260f22" />
 
 | 논리명 | 물리명 | 설명 |
 |---|---|---|
