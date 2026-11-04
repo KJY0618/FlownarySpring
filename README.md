@@ -33,7 +33,7 @@
 
 ## 💾 DB ERD
 
-![ERD]<img width="800" alt="ERD" src="https://github.com/user-attachments/assets/17dc037f-1423-46b8-9ebc-7bd4f0260f22" />
+<img width="800" alt="ERD" src="https://github.com/user-attachments/assets/17dc037f-1423-46b8-9ebc-7bd4f0260f22" />
 
 | 논리명 | 물리명 | 설명 |
 |---|---|---|
