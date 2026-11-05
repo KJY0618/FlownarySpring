@@ -25,7 +25,7 @@
 
 4060세대의 SNS 활동이 활발해지는 시대에, 다양한 연령층이 게시물을 가장 쉽고 단순하게 관리할 수 있도록 만들었습니다. 소통 단절로 소외될 수 있는 실버세대를 고려해, 어르신도 편하게 쓸 수 있으면서 트렌디한 UI에 초점을 맞췄습니다.
 
-최우선 키워드를 **소통**으로 두고 채팅 위젯을 홈 화면에 배치했고, 본인이 올린 게시물의 사진만 모아 보는 **앨범**, 가족 단위로 묶이는 **패밀리**, 글 작성 중 공개 범위를 정하는 **공개 설정**을 제공합니다.
+최우선 키워드를 **소통**으로 두고 채팅 위젯을 홈 화면에 배치했고, 본인이 올린 게시물의 사진만 모아 보는 **앨범**, 소모임을 만들어 구성원을 초대하는 **패밀리**, 글 작성 중 공개 범위를 정하는 **공개 설정**을 제공합니다.
 
 또한 웹소켓으로 채팅과 알림을 실시간으로 주고받을 수 있도록 구성했습니다.
 
@@ -42,10 +42,10 @@
 | 게시물 | Board | 게시글 |
 | 댓글 | Reply | 게시글의 댓글 |
 | 대댓글 | Re_Reply | 댓글의 답글 |
-| 좋아요 | Like_ | 좋아요 |
+| 좋아요 | Like_ | 좋아요 (`LIKE`가 SQL 예약어라 `_`를 붙여 충돌 방지) |
 | 팔로우 | Follow | 플로우(팔로우) 관계 |
-| 가족 | Family | 패밀리 |
-| 가족유저 | FamilyUser | 패밀리 구성원 |
+| 가족 | Family | 패밀리(소모임) |
+| 가족유저 | FamilyUser | 패밀리 구성원과 초대 상태 |
 | 채팅방 | Chat | 1:1 채팅방 |
 | 채팅유저 | ChatUser | 채팅방 참여자 |
 | 채팅메세지 | DmList | 채팅 메시지 |
@@ -65,7 +65,7 @@
 | 채팅 | 채팅방 목록, 채팅방 내부 실시간 대화 |
 | 마이페이지 | 기본 정보와 프로필 사진, 작성한 게시물/좋아요한 게시물 전환 |
 | 플로우(팔로우) | 플로워/플로잉 목록 모달, 타인 페이지에서 플로우 |
-| 패밀리 | 가족 구성, 패밀리장의 구성원 내보내기 |
+| 패밀리 | 소모임(패밀리) 생성, 다른 유저 초대, 구성원 목록 관리, 패밀리장의 구성원 내보내기 |
 | 알림 | 알림 내역 확인, 클릭 시 해당 게시물로 이동 |
 | 프로필 수정 | 프로필 이미지와 각종 정보 수정 |
 | 관리자 | 통계 페이지, 유저 비활성화, 게시물·신고 관리 |
@@ -87,34 +87,35 @@
 
 ## 📂 프로젝트 구조
 
-### 루트
+### 루트 파일
 
 | 경로 | 설명 |
 |---|---|
-| `pom.xml` | Maven 의존성 설정 |
-| `mvnw`, `mvnw.cmd` | Maven Wrapper |
-| `src/main/java` | 서버 소스 |
-| `src/main/resources` | 설정 파일, MyBatis 매퍼 |
-| `src/test/java` | 테스트 |
+| `README.md` | 프로젝트 소개와 실행 방법을 정리한 문서 |
+| `pom.xml` | Maven 의존성 및 빌드 설정 |
+| `mvnw`, `mvnw.cmd` | Maven Wrapper (Maven 설치 없이 실행) |
 
-### Java 소스 (`src/main/java/com/example/flownary`)
+### Java 소스 구조 (`src/main/java/com/example/flownary`)
 
 | 경로 | 설명 |
 |---|---|
-| `controller` | REST 및 웹소켓 컨트롤러 (게시글, 댓글, 채팅, 알림, 팔로우, 패밀리 등) |
-| `service` | 비즈니스 로직 (인터페이스 + Impl) |
-| `dao` | MyBatis 매퍼 인터페이스 |
-| `dto` | 요청·응답 객체 |
-| `entity` | 도메인 엔티티 |
-| `config` | WebSocket, MyBatis, CORS 설정 |
+| `controller` | HTTP 요청을 받아 서비스로 전달하는 컨트롤러 (게시글, 댓글, 채팅, 알림, 팔로우, 패밀리 등) |
+| `controller/WebController` | React 라우팅 경로를 `index.html`로 포워딩 |
+| `service` | 업무 로직 계층 (인터페이스 + Impl) |
+| `dao` | MyBatis 매퍼 인터페이스, DB 조회·저장 담당 |
+| `dto` | 요청·응답에 쓰는 데이터 전달 객체 |
+| `entity` | DB 테이블과 대응하는 도메인 엔티티 |
+| `config` | MyBatis, CORS, WebSocket(STOMP) 설정 및 연결 이벤트 처리 |
 | `filter` | CORS 필터 |
 
-### 설정 (`src/main/resources`)
+### 리소스 구조 (`src/main/resources`)
 
 | 경로 | 설명 |
 |---|---|
 | `application.properties` | 서버 포트, DB 연결, MyBatis 설정 |
-| `mybatis/mapper` | MyBatis 매퍼 |
+| `mybatis/mapper` | MyBatis SQL 매퍼 XML |
+| `static` | 빌드된 React 프론트엔드 정적 파일(HTML, JS, CSS, 이미지) |
+| `static/images` | 아이콘, 팀 이미지 등 화면 이미지 리소스 |
 
 ### 도메인별 구성
 
@@ -122,11 +123,21 @@
 |---|---|
 | User, Setting | 회원, 개인 설정 |
 | Board, Reply, Re_Reply, Like_ | 게시글, 댓글, 대댓글, 좋아요 |
-| Follow, Family, FamilyUser | 플로우, 패밀리 |
+| Follow | 플로우(팔로우) |
+| Family, FamilyUser | 패밀리(소모임), 구성원 |
 | Chat, ChatUser, DmList | 채팅방, 참여자, 메시지 |
 | Notice | 알림 |
 | Todo, Schedule | 할 일, 일정 |
 | Declaration | 신고 |
+
+### 설정 파일
+
+| 경로 | 설명 |
+|---|---|
+| `config/WebSocketConfig.java` | STOMP 엔드포인트(`/websocket`)와 메시지 경로(`/topic`, `/user`, `/app`) 설정 |
+| `config/WebSocketEventListener.java` | 웹소켓 연결·해제 이벤트 처리 |
+| `config/MyBatisConfig.java` | MyBatis 세션·매퍼 설정 |
+| `config/CorsConfig.java` | 프론트엔드 연동을 위한 CORS 설정 |
 
 * * *
 
@@ -140,7 +151,7 @@
    cd FlownarySpring
    ```
 2. MySQL에 `flownary` 데이터베이스를 만들고 ERD에 맞춰 테이블을 생성합니다.
-3. `src/main/resources/application.properties`의 DB 접속 정보를 수정합니다.
+3. DB 접속 정보는 환경변수 `DB_USERNAME`, `DB_PASSWORD`로 설정하거나, `application.properties`의 기본값을 본인 환경에 맞게 수정합니다.
 4. 서버를 실행합니다.
    ```bash
    ./mvnw spring-boot:run
